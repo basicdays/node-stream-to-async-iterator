@@ -1,0 +1,26 @@
+{
+  "name": "stream-async-iterator",
+  "version": "0.1.0",
+  "description": "ES async interator wrapper for node streams",
+  "main": "stream-async-iterator.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/basicdays/node-stream-async-iterator.git"
+  },
+  "keywords": [
+    "node",
+    "stream",
+    "async-iterator",
+    "promise",
+    "esnext"
+  ],
+  "author": "BasicDays <info@basicdays.com> (https://www.basicdays.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/basicdays/node-stream-async-iterator/issues"
+  },
+  "homepage": "https://github.com/basicdays/node-stream-async-iterator#readme"
+}
