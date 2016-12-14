@@ -48,7 +48,7 @@ build: node_modules ${build_files} ${build_asset_files} ${build_package_files}
 
 # Tasks
 
-full-test: lint test cover
+full-test: lint flow test cover
 
 flow:
 	flow
