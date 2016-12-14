@@ -48,6 +48,8 @@ build: node_modules ${build_files} ${build_asset_files} ${build_package_files}
 
 # Tasks
 
+full-test: lint test cover
+
 lint:
 	eslint lib
 

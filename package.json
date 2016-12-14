@@ -4,7 +4,7 @@
   "description": "ES async interator wrapper for node streams",
   "main": "stream-async-iterator.js",
   "scripts": {
-    "test": "make test"
+    "test": "make full-test"
   },
   "repository": {
     "type": "git",

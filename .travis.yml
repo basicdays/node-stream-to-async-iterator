@@ -4,3 +4,5 @@ node_js:
   - '6'
   - '4'
   - '4.5'
+install: make --no-builtin-rules --jobs=4
+script: make --no-builtin-rules full-test
