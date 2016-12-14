@@ -1,0 +1,28 @@
+{
+    "extends": ["eslint:recommended"],
+    "parser": "babel-eslint",
+    "env": {
+        "es6": true,
+        "node": true
+    },
+    "rules": {
+        "valid-jsdoc": ["error", {
+            "preferType": {
+                "Boolean": "boolean",
+                "Number": "number",
+                "String": "string",
+                "Symbol": "symbol",
+                "Function": "function",
+                "Null": "null",
+                "Undefined": "undefined",
+                "object": "Object",
+                "promise": "Promise"
+            },
+            "requireParamDescription": false,
+            "requireReturn": false,
+            "requireReturnDescription": false
+        }],
+        "consistent-return": ["error", {"treatUndefinedAsUnspecified": true}],
+        "no-unused-vars": ["error", {"args": "none"}]
+    }
+}

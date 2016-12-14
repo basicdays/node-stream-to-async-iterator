@@ -22,5 +22,25 @@
   "bugs": {
     "url": "https://github.com/basicdays/node-stream-async-iterator/issues"
   },
-  "homepage": "https://github.com/basicdays/node-stream-async-iterator#readme"
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-eslint": "^7.1.1",
+    "babel-plugin-istanbul": "^3.0.0",
+    "babel-plugin-transform-async-generator-functions": "^6.17.0",
+    "babel-polyfill": "^6.20.0",
+    "babel-preset-env": "^1.1.1",
+    "babel-register": "^6.18.0",
+    "chai": "^3.5.0",
+    "eslint": "^3.12.1",
+    "mocha": "^3.2.0",
+    "nyc": "^10.0.0",
+    "source-map-support": "^0.4.6"
+  },
+  "nyc": {
+    "require": [
+      "babel-register"
+    ],
+    "sourceMap": false,
+    "instrument": false
+  }
 }

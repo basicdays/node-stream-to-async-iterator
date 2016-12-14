@@ -1,0 +1,20 @@
+# project
+.nyc_output/
+build/
+
+# node
+node_modules/
+
+# editors
+.idea/dictionaries
+.idea/*.local.xml
+.idea/workspace.xml
+*.kate-swp
+*.swp
+
+# git
+*.orig
+
+# file managers
+.directory
+.DS_Store

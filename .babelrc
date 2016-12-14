@@ -1,0 +1,19 @@
+{
+    "presets": [
+        ["env", {
+            "targets": {
+                "node": 4.0
+            }
+        }]
+    ],
+    "plugins": [
+        "transform-async-generator-functions"
+    ],
+    "env": {
+        "cover": {
+            "plugins": [
+                "istanbul"
+            ]
+        }
+    }
+}
