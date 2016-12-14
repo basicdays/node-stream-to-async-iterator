@@ -1,6 +1,7 @@
 # project
 .nyc_output/
 build/
+coverage/
 
 # node
 node_modules/

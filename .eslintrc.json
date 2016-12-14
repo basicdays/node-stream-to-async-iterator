@@ -11,7 +11,7 @@
                 "Boolean": "boolean",
                 "Number": "number",
                 "String": "string",
-                "Symbol": "symbol",
+                "symbol": "Symbol",
                 "Function": "function",
                 "Null": "null",
                 "Undefined": "undefined",

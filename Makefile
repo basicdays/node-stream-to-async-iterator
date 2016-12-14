@@ -19,7 +19,7 @@ lib_asset_files := $(shell find lib -type f ! -name "*.js" ! -name ".eslintrc.*"
 
 build_files := $(lib_files:lib/%=build/%)
 build_asset_files := $(lib_asset_files:lib/%=build/%)
-build_package_files := build/README.md build/package.json
+build_package_files := build/README.md build/package.json build/license
 
 
 # Build
@@ -50,6 +50,12 @@ build: node_modules ${build_files} ${build_asset_files} ${build_package_files}
 
 full-test: lint test cover
 
+flow:
+	flow
+
+flow-stop:
+	flow stop
+
 lint:
 	eslint lib
 
@@ -58,12 +64,13 @@ test: build
 
 cover: node_modules
 	cd lib && BABEL_ENV=cover nyc ${test_command}
+	mv lib/coverage .
 
 clean:
 	rm -rf build .nyc_output
 
 maintainer-clean: clean
-	rm -rf node_modules
+	rm -rf node_modules coverage
 
 
-.PHONY: all lint test cover clean maintainer-clean
+.PHONY: all full-test flow flow-stop lint test cover clean maintainer-clean
