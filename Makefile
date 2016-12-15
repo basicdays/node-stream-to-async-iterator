@@ -1,3 +1,7 @@
+# hack to get osx to recognize a chane in PATH
+SHELL := /usr/bin/env sh
+PATH := $(shell pwd)/node_modules/.bin:${PATH}
+
 # Make Settings
 
 .SECONDEXPANSION:
@@ -7,8 +11,6 @@
 
 # Vars
 
-pwd := $(shell pwd)
-PATH := ${pwd}/node_modules/.bin:${PATH}
 test_command := mocha test --require=test/index --recursive
 
 

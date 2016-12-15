@@ -2,7 +2,7 @@ language: node_js
 node_js:
   - 'node'
   - '6'
-  - '4'
   - '4.5'
-install: make --no-builtin-rules --jobs=4
-script: make --no-builtin-rules full-test
+  - '4'
+install: make -j4 build
+script: make full-test
