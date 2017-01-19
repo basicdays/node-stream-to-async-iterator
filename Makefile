@@ -1,4 +1,4 @@
-# hack to get osx to recognize a chane in PATH
+# hack to get osx to recognize a change in PATH
 SHELL := /usr/bin/env sh
 PATH := $(shell pwd)/node_modules/.bin:${PATH}
 
@@ -21,7 +21,7 @@ lib_asset_files := $(shell find lib -type f ! -name "*.js" ! -name "*.js.flow" !
 
 build_files := $(lib_files:lib/%=build/%)
 build_asset_files := $(lib_asset_files:lib/%=build/%)
-build_package_files := build/README.md build/package.json build/license
+build_package_files := build/README.md build/package.json build/license build/.npmignore
 
 
 # Build
