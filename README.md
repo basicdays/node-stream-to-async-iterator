@@ -6,6 +6,8 @@
 `stream-async-iterator` provides a wrapper that implements `Symbol.asyncIterator`. This will allow streams to be usable
 as async iterables that can be used in for-await-of loops.
 
+Supports node.js 4 and up.
+
 ## Installation
 
 ```
