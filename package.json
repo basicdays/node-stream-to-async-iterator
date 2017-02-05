@@ -1,6 +1,6 @@
 {
   "name": "stream-to-async-iterator",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "ES async interator wrapper for node streams",
   "main": "stream-to-async-iterator.js",
   "scripts": {
