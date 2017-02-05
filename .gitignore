@@ -1,15 +1,16 @@
 # project
-.nyc_output/
-build/
-coverage/
+/.nyc_output/
+/build/
+/coverage/
 
 # node
 node_modules/
+npm-debug.log
 
 # editors
-.idea/dictionaries
-.idea/*.local.xml
-.idea/workspace.xml
+/.idea/dictionaries
+/.idea/*.local.xml
+/.idea/workspace.xml
 *.kate-swp
 *.swp
 
