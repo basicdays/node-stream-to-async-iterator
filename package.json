@@ -1,15 +1,15 @@
 {
-  "name": "stream-async-to-iterator",
+  "name": "stream-to-async-iterator",
   "version": "0.1.0",
   "description": "ES async interator wrapper for node streams",
-  "main": "stream-async-iterator.js",
+  "main": "stream-to-async-iterator.js",
   "scripts": {
     "build": "make -j4 build",
     "test": "make full-test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/basicdays/node-stream-async-iterator.git"
+    "url": "git+https://github.com/basicdays/node-stream-to-async-iterator.git"
   },
   "keywords": [
     "node",
@@ -21,7 +21,7 @@
   "author": "BasicDays <info@basicdays.com> (https://www.basicdays.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/basicdays/node-stream-async-iterator/issues"
+    "url": "https://github.com/basicdays/node-stream-to-async-iterator/issues"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
