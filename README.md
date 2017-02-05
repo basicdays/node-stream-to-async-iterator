@@ -1,4 +1,4 @@
-# Stream To Async Iterator
+# Stream To Async Iterator [![npm version](https://badge.fury.io/js/stream-to-async-iterator.svg)](https://badge.fury.io/js/stream-to-async-iterator) [![Build Status](https://travis-ci.org/basicdays/node-stream-to-async-iterator.svg?branch=master)](https://travis-ci.org/basicdays/node-stream-to-async-iterator)
 
 
 ## Overview
