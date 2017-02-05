@@ -2,6 +2,7 @@
 /.nyc_output/
 /build/
 /coverage/
+/scratch/
 
 # node
 node_modules/

@@ -17,11 +17,11 @@ test_command := mocha test --require=test/index --recursive
 # Files
 
 lib_files := $(shell find lib -type f -name *.js)
-lib_asset_files := $(shell find lib -type f ! -name "*.js" ! -name "*.js.flow" ! -name ".eslintrc.*" ! -name "*.orig")
+lib_asset_files := $(shell find lib -type f ! -name "*.js" ! -name ".eslintrc.*" ! -name "*.orig")
 
 build_files := $(lib_files:lib/%=build/%)
 build_asset_files := $(lib_asset_files:lib/%=build/%)
-build_package_files := build/README.md build/package.json build/license build/.npmignore
+build_package_files := build/README.md build/package.json build/license build/.npmignore build/History.md
 
 
 # Build
