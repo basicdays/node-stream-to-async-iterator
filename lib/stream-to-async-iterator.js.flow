@@ -1,11 +1,11 @@
 // @flow
 
-declare type StreamAsyncIteratorOptions = {
+declare type StreamToAsyncIteratorOptions = {
     size?: number;
 }
 
-declare export default class StreamAsyncIterator<TData> {
-    constructor(stream: stream$Readable, options?: StreamAsyncIteratorOptions): StreamAsyncIterator<TData>;
-    @@asyncIterator(): $AsyncIterator<TData, void, void>;
-    next(): Promise<IteratorResult<TData, void>>;
+declare export default class StreamToAsyncIterator<TVal> {
+    constructor(stream: stream$Readable, options?: StreamToAsyncIteratorOptions): void;
+    @@asyncIterator(): $AsyncIterator<TVal, void, void>;
+    next(): Promise<IteratorResult<TVal, void>>;
 }
