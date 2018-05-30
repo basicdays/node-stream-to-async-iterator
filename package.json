@@ -23,25 +23,55 @@
   "bugs": {
     "url": "https://github.com/basicdays/node-stream-to-async-iterator/issues"
   },
+  "dependencies": {
+    "@babel/runtime": "^7.0.0-beta.49"
+  },
   "devDependencies": {
-    "babel-cli": "^6.18.0",
-    "babel-eslint": "^7.1.1",
-    "babel-plugin-istanbul": "^3.0.0",
-    "babel-plugin-transform-async-generator-functions": "^6.17.0",
-    "babel-plugin-transform-flow-strip-types": "^6.18.0",
-    "babel-polyfill": "^6.20.0",
-    "babel-preset-env": "^1.1.1",
-    "babel-register": "^6.18.0",
-    "chai": "^3.5.0",
-    "eslint": "^3.12.1",
-    "flow-bin": "^0.38.0",
-    "mocha": "^3.2.0",
-    "nyc": "^10.0.0",
-    "source-map-support": "^0.4.6"
+    "@babel/cli": "^7.0.0-beta.49",
+    "@babel/core": "^7.0.0-beta.49",
+    "@babel/plugin-transform-runtime": "^7.0.0-beta.49",
+    "@babel/preset-env": "^7.0.0-beta.49",
+    "@babel/preset-flow": "^7.0.0-beta.49",
+    "@babel/preset-stage-3": "^7.0.0-beta.49",
+    "@babel/register": "^7.0.0-beta.49",
+    "babel-eslint": "^8.2.3",
+    "babel-plugin-istanbul": "^4.1.6",
+    "chai": "^4.1.2",
+    "eslint": "^4.19.1",
+    "flow-bin": "^0.73.0",
+    "mocha": "^5.2.0",
+    "nyc": "^11.8.0",
+    "source-map-support": "^0.5.6"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": 6
+          }
+        }
+      ],
+      "@babel/preset-stage-3",
+      "@babel/preset-flow"
+    ],
+    "plugins": [
+      [
+        "@babel/plugin-transform-runtime"
+      ]
+    ],
+    "env": {
+      "cover": {
+        "plugins": [
+          "istanbul"
+        ]
+      }
+    }
   },
   "nyc": {
     "require": [
-      "babel-register"
+      "@babel/register"
     ],
     "sourceMap": false,
     "instrument": false

@@ -66,7 +66,6 @@ test: build
 
 cover: node_modules
 	cd lib && BABEL_ENV=cover nyc ${test_command}
-	mv lib/coverage .
 
 clean:
 	rm -rf build .nyc_output

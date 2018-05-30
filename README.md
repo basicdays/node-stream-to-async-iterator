@@ -3,10 +3,10 @@
 
 ## Overview
 
-`stream-to-async-iterator` provides a wrapper that implements `Symbol.asyncIterator`. This will allow streams to be usable
-as async iterables that can be used in for-await-of loops.
+`stream-to-async-iterator` provides a wrapper that implements `Symbol.asyncIterator`. This will allow streams to be
+usable as async iterables that can be used in for-await-of loops.
 
-Supports node.js 4 and up.
+Supports node.js 6 and up.
 
 ## Installation
 
@@ -14,7 +14,7 @@ Supports node.js 4 and up.
 $ npm install stream-to-async-iterator
 ```
 
-The examples provides use async/await syntax for for-of loops. This assumes you are in an environment that natively
+The included examples use async/await syntax for for-of loops. This assumes you are in an environment that natively
 supports this new syntax, or that you use a tool such as Babel. In addition, for async iterators to work properly,
 the `Symbol.asyncIterator` symbol must be defined. Core-js or `babel-polyfill` can both help with that.
 
