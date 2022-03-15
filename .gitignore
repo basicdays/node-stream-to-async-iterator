@@ -1,7 +1,8 @@
 # project
 /.nyc_output/
-/build/
+/lib/
 /scratch/
+*.tsbuildinfo
 
 # node
 node_modules/

@@ -1,0 +1,4 @@
+{
+    "require": ["./src/test/index.ts"],
+    "spec": ["./src/**/*.test.ts", "./src/test/**/*.ts"]
+}

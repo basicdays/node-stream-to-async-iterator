@@ -1,14 +1,13 @@
-// @flow
-import type {Readable} from 'stream';
+import { Readable } from "stream";
 
 /**
  * @type {Object.<string, Symbol>}
  */
 export const states = {
-    notReadable: Symbol('not readable'),
-    readable: Symbol('readable'),
-    ended: Symbol('ended'),
-    errored: Symbol('errored'),
+    notReadable: Symbol("not readable"),
+    readable: Symbol("readable"),
+    ended: Symbol("ended"),
+    errored: Symbol("errored"),
 };
 
 /*
@@ -16,9 +15,9 @@ export const states = {
  * function be called after the promise finishes.
  */
 type PromiseWithCleanUp<T> = {
-    promise: Promise<T>,
-    cleanup: () => void,
-}
+    promise: Promise<T>;
+    cleanup: () => void;
+};
 
 /**
  * @typedef {Object} StreamToAsyncIterator~Options
@@ -26,7 +25,7 @@ type PromiseWithCleanUp<T> = {
  */
 type StreamToAsyncIteratorOptions = {
     size?: number;
-}
+};
 
 /**
  * @typedef {Object} StreamToAsyncIterator~Iteration
@@ -36,7 +35,7 @@ type StreamToAsyncIteratorOptions = {
 type Iteration<TVal> = {
     done: boolean;
     value?: TVal;
-}
+};
 
 type Reject = (err: any) => void;
 
@@ -49,16 +48,16 @@ type Reject = (err: any) => void;
  */
 export default class StreamToAsyncIterator<TVal> {
     _stream: Readable;
-    _error: ?Error;
+    _error: Error | null | undefined;
     _state: Symbol;
-    _size: ?number;
+    _size: number | null | undefined;
     _rejections: Set<Reject>;
 
     /**
      * @param {Readable} stream
      * @param {StreamToAsyncIterator~Options} [options]
      */
-    constructor(stream: Readable, options: StreamToAsyncIteratorOptions={}) {
+    constructor(stream: Readable, options: StreamToAsyncIteratorOptions = {}) {
         /**
          * The underlying readable stream
          * @private
@@ -105,8 +104,8 @@ export default class StreamToAsyncIterator<TVal> {
             this._state = states.ended;
         };
 
-        stream.once('error', handleStreamError);
-        stream.once('end', handleStreamEnd);
+        stream.once("error", handleStreamError);
+        stream.once("end", handleStreamEnd);
     }
 
     //todo: flow is not working with this method in place
@@ -127,26 +126,26 @@ export default class StreamToAsyncIterator<TVal> {
             try {
                 await Promise.race([read.promise, end.promise]);
                 return this.next();
-            }
-            catch (e) {
+            } catch (e) {
                 throw e;
-            }
-            finally {
+            } finally {
                 //need to clean up any hanging event listeners
                 read.cleanup();
                 end.cleanup();
             }
         } else if (this._state === states.ended) {
-            return {done: true};
+            return { done: true };
         } else if (this._state === states.errored) {
             throw this._error;
-        } else /* readable */ {
+        } /* readable */ else {
             //stream.read returns null if not readable or when stream has ended
 
-            const data: TVal = this._size ? (this._stream.read(this._size): any) : (this._stream.read(): any);
+            const data: TVal = this._size
+                ? (this._stream.read(this._size) as any)
+                : (this._stream.read() as any);
 
             if (data !== null) {
-                return {done: false, value: data};
+                return { done: false, value: data };
             } else {
                 //we're no longer readable, need to find out what state we're in
                 this._state = states.notReadable;
@@ -178,13 +177,13 @@ export default class StreamToAsyncIterator<TVal> {
 
             //on is used here instead of once, because
             //the listener is remove afterwards anyways.
-            this._stream.once('readable', eventListener);
+            this._stream.once("readable", eventListener);
             this._rejections.add(reject);
         });
 
         const cleanup = () => {
             if (eventListener == null) return;
-            this._stream.removeListener('readable', eventListener);
+            this._stream.removeListener("readable", eventListener);
         };
 
         return { cleanup, promise };
@@ -207,13 +206,13 @@ export default class StreamToAsyncIterator<TVal> {
                 resolve();
             };
 
-            this._stream.once('end', eventListener);
+            this._stream.once("end", eventListener);
             this._rejections.add(reject);
         });
 
         const cleanup = () => {
             if (eventListener == null) return;
-            this._stream.removeListener('end', eventListener);
+            this._stream.removeListener("end", eventListener);
         };
 
         return { cleanup, promise };
@@ -221,7 +220,13 @@ export default class StreamToAsyncIterator<TVal> {
 }
 
 //hack: gets around flows inability to handle symbol properties
-Object.defineProperty(StreamToAsyncIterator.prototype, (Symbol: any).asyncIterator, {
-    configurable: true,
-    value: function() {return this;}
-});
+Object.defineProperty(
+    StreamToAsyncIterator.prototype,
+    (Symbol as any).asyncIterator,
+    {
+        configurable: true,
+        value: function () {
+            return this;
+        },
+    }
+);
