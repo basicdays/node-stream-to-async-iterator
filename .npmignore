@@ -1,0 +1,5 @@
+*
+!lib/**/*
+lib/**/*.map
+lib/**/*.test.{d.ts,js}
+lib/test/**/*

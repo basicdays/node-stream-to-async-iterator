@@ -1,0 +1,8 @@
+# project
+/.nyc_output/
+/coverage/
+/lib/
+*.tsbuildinfo
+
+# node
+node_modules/

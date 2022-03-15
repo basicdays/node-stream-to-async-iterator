@@ -1,14 +1,16 @@
 import { Readable } from "stream";
 
-/**
- * @type {Object.<string, Symbol>}
- */
-export const states = {
-    notReadable: Symbol("not readable"),
-    readable: Symbol("readable"),
-    ended: Symbol("ended"),
-    errored: Symbol("errored"),
-};
+const NOT_READABLE: unique symbol = Symbol("not readable");
+const READABLE: unique symbol = Symbol("readable");
+const ENDED: unique symbol = Symbol("ended");
+const ERRORED: unique symbol = Symbol("errored");
+const STATES = {
+    notReadable: NOT_READABLE,
+    readable: READABLE,
+    ended: ENDED,
+    errored: ERRORED,
+} as const;
+type States = typeof STATES[keyof typeof STATES];
 
 /*
  * A contract for a promise that requires a clean up
@@ -19,25 +21,10 @@ type PromiseWithCleanUp<T> = {
     cleanup: () => void;
 };
 
-/**
- * @typedef {Object} StreamToAsyncIterator~Options
- * @property {number} [size] - the size of each read from the stream for each iteration
- */
-type StreamToAsyncIteratorOptions = {
+export type StreamToAsyncIteratorOptions = {
+    /** The size of each read from the stream for each iteration */
     size?: number;
 };
-
-/**
- * @typedef {Object} StreamToAsyncIterator~Iteration
- * @property {boolean} done
- * @property {*} [value]
- */
-type Iteration<TVal> = {
-    done: boolean;
-    value?: TVal;
-};
-
-type Reject = (err: any) => void;
 
 /**
  * Wraps a stream into an object that can be used as an async iterator.
@@ -46,128 +33,105 @@ type Reject = (err: any) => void;
  * iteration. A size can be supplied to set an explicit call to `stream.read([size])` in
  * the options for each iteration.
  */
-export default class StreamToAsyncIterator<TVal> {
-    _stream: Readable;
-    _error: Error | null | undefined;
-    _state: Symbol;
-    _size: number | null | undefined;
-    _rejections: Set<Reject>;
+export default class StreamToAsyncIterator<T = unknown>
+    implements AsyncIterableIterator<T>
+{
+    /** The underlying readable stream */
+    private _stream: Readable;
+    /** Contains stream's error when stream has error'ed out */
+    private _error: Error | undefined;
+    /** The current state of the iterator (not readable, readable, ended, errored) */
+    private _state: States = STATES.notReadable;
+    private _size: number | undefined;
+    /** The rejections of promises to call when stream errors out */
+    private _rejections: Set<(err: any) => void> = new Set();
 
-    /**
-     * @param {Readable} stream
-     * @param {StreamToAsyncIterator~Options} [options]
-     */
-    constructor(stream: Readable, options: StreamToAsyncIteratorOptions = {}) {
-        /**
-         * The underlying readable stream
-         * @private
-         * @type {Readable}
-         */
+    constructor(stream: Readable, { size }: StreamToAsyncIteratorOptions = {}) {
         this._stream = stream;
+        this._size = size;
 
-        /**
-         * Contains stream's error when stream has error'ed out
-         * @private
-         * @type {?Error}
-         */
-        this._error = undefined;
-
-        /**
-         * The current state of the iterator (not readable, readable, ended, errored)
-         * @private
-         * @type {Symbol}
-         */
-        this._state = states.notReadable;
-
-        /**
-         * @private
-         * @type {?number}
-         */
-        this._size = options.size;
-
-        /**
-         * The rejections of promises to call when stream errors out
-         * @private
-         * @type {Set.<function(err: Error)>}
-         */
-        this._rejections = new Set();
-
-        const handleStreamError = (err) => {
+        const handleStreamError = (err: Error) => {
             this._error = err;
-            this._state = states.errored;
+            this._state = STATES.errored;
             for (const reject of this._rejections) {
                 reject(err);
             }
         };
 
         const handleStreamEnd = () => {
-            this._state = states.ended;
+            this._state = STATES.ended;
         };
 
         stream.once("error", handleStreamError);
         stream.once("end", handleStreamEnd);
     }
 
-    //todo: flow is not working with this method in place
-    // [Symbol.asyncIterator]() {
-    //     return this;
-    // }
+    [Symbol.asyncIterator]() {
+        return this;
+    }
 
     /**
      * Returns the next iteration of data. Rejects if the stream errored out.
-     * @returns {Promise<StreamToAsyncIterator~Iteration>}
      */
-    async next(): Promise<Iteration<TVal>> {
-        if (this._state === states.notReadable) {
-            const read = this._untilReadable();
-            const end = this._untilEnd();
+    async next(): Promise<IteratorResult<T, void>> {
+        switch (this._state) {
+            case STATES.notReadable: {
+                const read = this._untilReadable();
+                const end = this._untilEnd();
 
-            //need to wait until the stream is readable or ended
-            try {
-                await Promise.race([read.promise, end.promise]);
-                return this.next();
-            } catch (e) {
-                throw e;
-            } finally {
-                //need to clean up any hanging event listeners
-                read.cleanup();
-                end.cleanup();
+                //need to wait until the stream is readable or ended
+                try {
+                    await Promise.race([read.promise, end.promise]);
+                    return this.next();
+                } catch (e) {
+                    throw e;
+                } finally {
+                    //need to clean up any hanging event listeners
+                    read.cleanup();
+                    end.cleanup();
+                }
             }
-        } else if (this._state === states.ended) {
-            return { done: true };
-        } else if (this._state === states.errored) {
-            throw this._error;
-        } /* readable */ else {
-            //stream.read returns null if not readable or when stream has ended
+            case STATES.ended: {
+                return { done: true, value: undefined };
+            }
+            case STATES.errored: {
+                throw this._error;
+            }
+            case STATES.readable: {
+                //stream.read returns null if not readable or when stream has ended
 
-            const data: TVal = this._size
-                ? (this._stream.read(this._size) as any)
-                : (this._stream.read() as any);
+                const data: T = this._size
+                    ? this._stream.read(this._size)
+                    : this._stream.read();
 
-            if (data !== null) {
-                return { done: false, value: data };
-            } else {
-                //we're no longer readable, need to find out what state we're in
-                this._state = states.notReadable;
-                return this.next();
+                if (data !== null) {
+                    return { done: false, value: data };
+                } else {
+                    //we're no longer readable, need to find out what state we're in
+                    this._state = STATES.notReadable;
+                    // todo: COMPLETE hack, need to find a better way to wait for readable
+                    //       state is ping ponging between read and notreadable too fast
+                    await new Promise((resolve) => {
+                        setTimeout(resolve, 250);
+                    });
+                    return this.next();
+                }
             }
         }
     }
 
     /**
      * Waits until the stream is readable. Rejects if the stream errored out.
-     * @private
-     * @returns {Promise}
      */
-    _untilReadable(): PromiseWithCleanUp<void> {
+    private _untilReadable(): PromiseWithCleanUp<void> {
         //let is used here instead of const because the exact reference is
         //required to remove it, this is why it is not a curried function that
         //accepts resolve & reject as parameters.
-        let eventListener = undefined;
+        let eventListener: (() => void) | undefined = undefined;
 
-        const promise = new Promise((resolve, reject) => {
+        const promise = new Promise<void>((resolve, reject) => {
             eventListener = () => {
-                this._state = states.readable;
+                this._state = STATES.readable;
                 this._rejections.delete(reject);
 
                 // we set this to undefined to info the clean up not to do anything
@@ -191,15 +155,13 @@ export default class StreamToAsyncIterator<TVal> {
 
     /**
      * Waits until the stream is ended. Rejects if the stream errored out.
-     * @private
-     * @returns {Promise}
      */
-    _untilEnd(): PromiseWithCleanUp<void> {
-        let eventListener = undefined;
+    private _untilEnd(): PromiseWithCleanUp<void> {
+        let eventListener: (() => void) | undefined = undefined;
 
-        const promise = new Promise((resolve, reject) => {
+        const promise = new Promise<void>((resolve, reject) => {
             eventListener = () => {
-                this._state = states.ended;
+                this._state = STATES.ended;
                 this._rejections.delete(reject);
 
                 eventListener = undefined;
@@ -218,15 +180,3 @@ export default class StreamToAsyncIterator<TVal> {
         return { cleanup, promise };
     }
 }
-
-//hack: gets around flows inability to handle symbol properties
-Object.defineProperty(
-    StreamToAsyncIterator.prototype,
-    (Symbol as any).asyncIterator,
-    {
-        configurable: true,
-        value: function () {
-            return this;
-        },
-    }
-);

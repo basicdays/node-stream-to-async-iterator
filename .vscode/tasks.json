@@ -1,0 +1,35 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "npm",
+            "script": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "label": "npm: build",
+            "detail": "run-p 'build:*'"
+        },
+        {
+            "type": "npm",
+            "script": "watch",
+            "group": "build",
+            "problemMatcher": [],
+            "label": "npm: watch",
+            "detail": "run-p 'watch:*'"
+        },
+        {
+            "type": "npm",
+            "script": "test",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "label": "npm: test",
+            "detail": "mocha"
+        }
+    ]
+}

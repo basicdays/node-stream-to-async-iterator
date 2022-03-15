@@ -2,22 +2,6 @@
     "name": "stream-to-async-iterator",
     "version": "1.0.0",
     "description": "ES async interator wrapper for node streams",
-    "homepage": "https://github.com/basicdays/node-stream-to-async-iterator#readme",
-    "bugs": {
-        "url": "https://github.com/basicdays/node-stream-to-async-iterator/issues"
-    },
-    "license": "MIT",
-    "author": "BasicDays <info@basicdays.com> (https://www.basicdays.com)",
-    "files": [
-        "lib/**/*",
-        "!lib/**/*.test.js",
-        "!lib/test/**/*"
-    ],
-    "main": "lib/stream-to-async-iterator.js",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/basicdays/node-stream-to-async-iterator.git"
-    },
     "keywords": [
         "node",
         "stream",
@@ -25,11 +9,22 @@
         "promise",
         "esnext"
     ],
+    "homepage": "https://github.com/basicdays/node-stream-to-async-iterator#readme",
+    "bugs": {
+        "url": "https://github.com/basicdays/node-stream-to-async-iterator/issues"
+    },
+    "license": "MIT",
+    "author": "BasicDays <info@basicdays.com> (https://www.basicdays.com)",
+    "main": "lib/stream-to-async-iterator.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/basicdays/node-stream-to-async-iterator.git"
+    },
     "scripts": {
         "build": "run-p 'build:*'",
-        "build:babel": "babel src --out-dir lib --source-maps --copy-files --extensions '.ts'",
+        "build:babel": "babel src --out-dir lib --source-maps --copy-files --extensions '.ts,.tsx,.js,.mjs'",
         "build:tsc": "tsc --emitDeclarationOnly",
-        "clean": "rm -rf lib",
+        "clean": "rm -rf coverage lib .nyc_output *.tsbuildinfo",
         "cover": "BABEL_ENV=cover nyc mocha --config ./.mocharc.cover.json",
         "lint": "eslint .",
         "test": "mocha",
@@ -49,6 +44,9 @@
         "@babel/preset-env": "^7.16.11",
         "@babel/preset-typescript": "^7.16.7",
         "@babel/register": "^7.17.7",
+        "@istanbuljs/nyc-config-babel": "^3.0.0",
+        "@types/chai": "^4.3.0",
+        "@types/mocha": "^9.1.0",
         "@types/node": "^17.0.21",
         "babel-eslint": "^8.2.3",
         "babel-plugin-istanbul": "^6.1.1",
@@ -101,10 +99,13 @@
         "node 12"
     ],
     "nyc": {
-        "require": [
-            "@babel/register"
+        "extends": "@istanbuljs/nyc-config-babel",
+        "include": [
+            "src/**/*.{ts,tsx,js,mjs}"
         ],
-        "sourceMap": false,
-        "instrument": false
+        "exclude": [
+            "src/test/**",
+            "*.test.{ts,tsx,js,mjs}"
+        ]
     }
 }
