@@ -44,7 +44,7 @@ export default class StreamToAsyncIterator<T = unknown>
     private _state: States = STATES.notReadable;
     private _size: number | undefined;
     /** The rejections of promises to call when stream errors out */
-    private _rejections: Set<(err: any) => void> = new Set();
+    private _rejections: Set<(err: Error) => void> = new Set();
 
     constructor(stream: Readable, { size }: StreamToAsyncIteratorOptions = {}) {
         this._stream = stream;
@@ -83,8 +83,6 @@ export default class StreamToAsyncIterator<T = unknown>
                 try {
                     await Promise.race([read.promise, end.promise]);
                     return this.next();
-                } catch (e) {
-                    throw e;
                 } finally {
                     //need to clean up any hanging event listeners
                     read.cleanup();
@@ -100,6 +98,7 @@ export default class StreamToAsyncIterator<T = unknown>
             case STATES.readable: {
                 //stream.read returns null if not readable or when stream has ended
 
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const data: T = this._size
                     ? this._stream.read(this._size)
                     : this._stream.read();
@@ -122,6 +121,7 @@ export default class StreamToAsyncIterator<T = unknown>
 
     /**
      * Waits until the stream is readable. Rejects if the stream errored out.
+     * @returns Promise when stream is readable
      */
     private _untilReadable(): PromiseWithCleanUp<void> {
         //let is used here instead of const because the exact reference is
@@ -155,6 +155,7 @@ export default class StreamToAsyncIterator<T = unknown>
 
     /**
      * Waits until the stream is ended. Rejects if the stream errored out.
+     * @returns Promise when stream is finished
      */
     private _untilEnd(): PromiseWithCleanUp<void> {
         let eventListener: (() => void) | undefined = undefined;

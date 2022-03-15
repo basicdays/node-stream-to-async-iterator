@@ -1,7 +1,7 @@
 language: node_js
 node_js:
-  - 'node'
-  - '8'
-  - '6'
-install: make -j4 build
-script: make full-test
+    - "node"
+    - "16"
+    - "14"
+    - "12"
+before_script: npm run build
