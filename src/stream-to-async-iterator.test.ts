@@ -52,6 +52,25 @@ describe("StreamToAsyncIterator", function () {
         expect(buff).to.have.lengthOf(3);
     });
 
+    it("should handle larger streams without memory leaks", async function () {
+        this.slow(500);
+        type Obj = { id: number };
+        const data: Obj[] = [];
+        for (let id = 0; id < 10000; id += 1) {
+            data.push({ id });
+        }
+        const objStream = Readable.from(data);
+        const iter = new S2A<Obj>(objStream);
+        const buff: Obj[] = [];
+
+        for await (const value of iter) {
+            buff.push(value);
+        }
+
+        assertClosed(objStream, iter);
+        expect(buff).to.have.lengthOf(data.length);
+    });
+
     it("should iterate on an empty stream", async function () {
         type Obj = { id: number };
         const data: Obj[] = [];
