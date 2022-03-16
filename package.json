@@ -20,6 +20,9 @@
         "type": "git",
         "url": "git+https://github.com/basicdays/node-stream-to-async-iterator.git"
     },
+    "engines": {
+        "node": ">=12"
+    },
     "scripts": {
         "build": "run-p 'build:*'",
         "build:babel": "babel src --out-dir lib --source-maps --copy-files --extensions '.ts,.tsx,.js,.mjs'",
