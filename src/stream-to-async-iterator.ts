@@ -16,9 +16,9 @@ type States = typeof STATES[keyof typeof STATES];
  * A contract for a promise that requires a clean up
  * function be called after the promise finishes.
  */
-type PromiseWithCleanUp<T> = {
+type ClosablePromise<T> = {
     promise: Promise<T>;
-    cleanup: () => void;
+    close: () => void;
 };
 
 export type StreamToAsyncIteratorOptions = {
@@ -45,25 +45,27 @@ export default class StreamToAsyncIterator<T = unknown>
     private _size: number | undefined;
     /** The rejections of promises to call when stream errors out */
     private _rejections: Set<(err: Error) => void> = new Set();
+    get closed() {
+        return this._state === STATES.ended;
+    }
 
     constructor(stream: Readable, { size }: StreamToAsyncIteratorOptions = {}) {
         this._stream = stream;
         this._size = size;
 
-        const handleStreamError = (err: Error) => {
-            this._error = err;
-            this._state = STATES.errored;
-            for (const reject of this._rejections) {
-                reject(err);
-            }
-        };
+        const bindMethods = ["_handleStreamEnd", "_handleStreamError"] as const;
+        for (const method of bindMethods) {
+            Object.defineProperty(this, method, {
+                configurable: true,
+                writable: true,
+                value: this[method].bind(this),
+            });
+        }
 
-        const handleStreamEnd = () => {
-            this._state = STATES.ended;
-        };
-
-        stream.once("error", handleStreamError);
-        stream.once("end", handleStreamEnd);
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        stream.once("error", this._handleStreamError);
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        stream.once("end", this._handleStreamEnd);
     }
 
     [Symbol.asyncIterator]() {
@@ -76,28 +78,38 @@ export default class StreamToAsyncIterator<T = unknown>
     async next(): Promise<IteratorResult<T, void>> {
         switch (this._state) {
             case STATES.notReadable: {
-                const read = this._untilReadable();
-                const end = this._untilEnd();
-
-                //need to wait until the stream is readable or ended
+                let untilReadable;
+                let untilEnd;
                 try {
-                    await Promise.race([read.promise, end.promise]);
-                    return this.next();
+                    untilReadable = this._untilReadable();
+                    untilEnd = this._untilEnd();
+                    // need to wait until the stream is readable or ended
+                    await Promise.race([
+                        untilReadable.promise,
+                        untilEnd.promise,
+                    ]);
                 } finally {
-                    //need to clean up any hanging event listeners
-                    read.cleanup();
-                    end.cleanup();
+                    // need to clean up any hanging event listeners
+                    if (untilReadable != null) {
+                        untilReadable.close();
+                    }
+                    if (untilEnd != null) {
+                        untilEnd.close();
+                    }
                 }
+                return this.next();
             }
             case STATES.ended: {
+                this.close();
                 return { done: true, value: undefined };
             }
             case STATES.errored: {
+                this.close();
                 throw this._error;
             }
             case STATES.readable: {
-                //stream.read returns null if not readable or when stream has ended
-
+                // stream.read returns null if not readable or when stream has ended
+                // todo: Could add a way to ensure data-type/shape of reads to make this type safe
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const data: T = this._size
                     ? this._stream.read(this._size)
@@ -108,11 +120,8 @@ export default class StreamToAsyncIterator<T = unknown>
                 } else {
                     //we're no longer readable, need to find out what state we're in
                     this._state = STATES.notReadable;
-                    // todo: COMPLETE hack, need to find a better way to wait for readable
-                    //       state is ping ponging between read and notreadable too fast
-                    await new Promise((resolve) => {
-                        setTimeout(resolve, 250);
-                    });
+                    // need to let event loop run to fill stream buffer
+                    await new Promise(setImmediate);
                     return this.next();
                 }
             }
@@ -123,61 +132,93 @@ export default class StreamToAsyncIterator<T = unknown>
      * Waits until the stream is readable. Rejects if the stream errored out.
      * @returns Promise when stream is readable
      */
-    private _untilReadable(): PromiseWithCleanUp<void> {
+    private _untilReadable(): ClosablePromise<void> {
         //let is used here instead of const because the exact reference is
         //required to remove it, this is why it is not a curried function that
         //accepts resolve & reject as parameters.
-        let eventListener: (() => void) | undefined = undefined;
+        let handleReadable: (() => void) | undefined = undefined;
 
         const promise = new Promise<void>((resolve, reject) => {
-            eventListener = () => {
+            handleReadable = () => {
                 this._state = STATES.readable;
                 this._rejections.delete(reject);
-
-                // we set this to undefined to info the clean up not to do anything
-                eventListener = undefined;
                 resolve();
             };
 
-            //on is used here instead of once, because
-            //the listener is remove afterwards anyways.
-            this._stream.once("readable", eventListener);
+            this._stream.once("readable", handleReadable);
             this._rejections.add(reject);
         });
 
         const cleanup = () => {
-            if (eventListener == null) return;
-            this._stream.removeListener("readable", eventListener);
+            if (handleReadable != null) {
+                this._stream.removeListener("readable", handleReadable);
+            }
         };
 
-        return { cleanup, promise };
+        return { close: cleanup, promise };
     }
 
     /**
      * Waits until the stream is ended. Rejects if the stream errored out.
      * @returns Promise when stream is finished
      */
-    private _untilEnd(): PromiseWithCleanUp<void> {
-        let eventListener: (() => void) | undefined = undefined;
+    private _untilEnd(): ClosablePromise<void> {
+        let handleEnd: (() => void) | undefined = undefined;
 
         const promise = new Promise<void>((resolve, reject) => {
-            eventListener = () => {
+            handleEnd = () => {
                 this._state = STATES.ended;
                 this._rejections.delete(reject);
-
-                eventListener = undefined;
                 resolve();
             };
 
-            this._stream.once("end", eventListener);
+            this._stream.once("end", handleEnd);
             this._rejections.add(reject);
         });
 
         const cleanup = () => {
-            if (eventListener == null) return;
-            this._stream.removeListener("end", eventListener);
+            if (handleEnd != null) {
+                this._stream.removeListener("end", handleEnd);
+            }
         };
 
-        return { cleanup, promise };
+        return { close: cleanup, promise };
+    }
+
+    return(): Promise<IteratorResult<T, void>> {
+        this._state = STATES.ended;
+        return this.next();
+    }
+
+    throw(err?: Error): Promise<IteratorResult<T, void>> {
+        this._error = err;
+        this._state = STATES.errored;
+        return this.next();
+    }
+
+    /**
+     * Destroy the stream
+     * @param err An optional error to pass to the stream for an error event
+     */
+    close(err?: Error) {
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        this._stream.removeListener("end", this._handleStreamEnd);
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        this._stream.removeListener("error", this._handleStreamError);
+
+        this._state = STATES.ended;
+        this._stream.destroy(err);
+    }
+
+    private _handleStreamError(err: Error) {
+        this._error = err;
+        this._state = STATES.errored;
+        for (const reject of this._rejections) {
+            reject(err);
+        }
+    }
+
+    private _handleStreamEnd() {
+        this._state = STATES.ended;
     }
 }

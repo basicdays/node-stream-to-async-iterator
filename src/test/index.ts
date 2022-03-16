@@ -1,4 +1,8 @@
+import chai from "chai";
+import chaiAsPromised from "chai-as-promised";
 import "source-map-support/register";
+
+chai.use(chaiAsPromised);
 
 process.on("unhandledRejection", (reason) => {
     let message = "Unknown error";
