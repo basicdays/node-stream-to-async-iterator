@@ -1,23 +1,29 @@
-# Stream To Async Iterator [![npm version](https://badge.fury.io/js/stream-to-async-iterator.svg)](https://www.npmjs.com/package/stream-to-async-iterator) [![Build Status](https://travis-ci.org/basicdays/node-stream-to-async-iterator.svg?branch=master)](https://travis-ci.org/basicdays/node-stream-to-async-iterator)
-
+# Stream To Async Iterator [![npm version](https://badge.fury.io/js/stream-to-async-iterator.svg)](https://www.npmjs.com/package/stream-to-async-iterator) ![build](https://github.com/basicdays/node-stream-to-async-iterator/actions/workflows/build.yml/badge.svg)
 
 ## Overview
 
-`stream-to-async-iterator` provides a wrapper that implements `Symbol.asyncIterator`. This will allow streams to be usable
-as async iterables that can be used in for-await-of loops.
+`stream-to-async-iterator` provides a wrapper that implements `Symbol.asyncIterator`. This will allow streams to be
+usable as async iterables that can be used in for-await-of loops.
 
-Supports node.js 4 and up.
+Supports node.js 12 and up.
 
 ## Installation
 
-```
-$ npm install stream-to-async-iterator
+With NPM:
+
+```shell
+npm install stream-to-async-iterator
 ```
 
-The examples provides use async/await syntax for for-of loops. This assumes you are in an environment that natively
+With Yarn:
+
+```shell
+yarn add stream-to-async-iterator
+```
+
+The included examples use async/await syntax for for-of loops. This assumes you are in an environment that natively
 supports this new syntax, or that you use a tool such as Babel. In addition, for async iterators to work properly,
-the `Symbol.asyncIterator` symbol must be defined. Core-js or `babel-polyfill` can both help with that.
-
+the `Symbol.asyncIterator` symbol must be defined. Core-js can help with that.
 
 ## Usage
 
@@ -30,22 +36,27 @@ information.
 
 ```js
 #!/usr/bin/env node
-'use strict';
-require('core-js/es7/symbol');
-const fs = require('fs');
-const S2A = require('stream-to-async-iterator');
+"use strict";
+const { Readable } = require("stream");
+const S2A = require("../").default;
 
-
-(async function() {
-    const readStream = fs.createReadStream(__filename);
+(async function () {
+    const readStream = Readable.from([1, 2, 3]);
     for await (const chunk of new S2A(readStream)) {
-        console.log(chunk);
+        console.dir({ chunk });
     }
 })();
 ```
 
+Outputs:
+
+```
+{ chunk: 1 }
+{ chunk: 2 }
+{ chunk: 3 }
+```
 
 ## References
 
-- https://github.com/tc39/proposal-async-iteration
-- https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-async-generator-functions
+-   https://github.com/tc39/proposal-async-iteration
+-   https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-async-generator-functions

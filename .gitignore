@@ -1,22 +1,24 @@
 # project
 /.nyc_output/
-/build/
 /coverage/
+/lib/
+*.tsbuildinfo
+*.tgz
 
 # node
-node_modules/
-npm-debug.log
+/node_modules/
+**/npm-debug.log*
 
 # editors
-/.idea/dictionaries
-/.idea/*.local.xml
-/.idea/workspace.xml
-*.kate-swp
-*.swp
+/.idea/
+**/*.kate-swp
+**/*.swp
+**/*~
 
 # git
-*.orig
+**/*.orig
 
 # file managers
-.directory
-.DS_Store
+**/.directory
+**/.DS_Store
+**/Thumbs.db

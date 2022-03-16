@@ -1,0 +1,7 @@
+{
+    "require": ["./src/test/index.ts"],
+    "spec": [
+        "./src/**/*.test.{ts,tsx,js,mjs}",
+        "./src/test/**/*.{ts,tsx,js,mjs}"
+    ]
+}

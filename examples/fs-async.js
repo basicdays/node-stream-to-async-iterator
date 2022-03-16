@@ -1,13 +1,11 @@
 #!/usr/bin/env node
-'use strict';
-require('core-js/es7/symbol');
-const fs = require('fs');
-const S2A = require('..');
+"use strict";
+const { Readable } = require("stream");
+const S2A = require("../").default;
 
-
-(async function() {
-    const readStream = fs.createReadStream(__filename);
+(async function () {
+    const readStream = Readable.from([1, 2, 3]);
     for await (const chunk of new S2A(readStream)) {
-        console.log(chunk);
+        console.dir({ chunk });
     }
 })();

@@ -1,0 +1,10 @@
+version: 2
+
+updates:
+    # see: https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/keeping-your-actions-up-to-date-with-github-dependabot
+    - package-ecosystem: github-actions
+      directory: "/"
+      schedule:
+          interval: daily
+      reviewers:
+          - basicdays

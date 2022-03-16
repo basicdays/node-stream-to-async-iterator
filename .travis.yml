@@ -1,8 +1,0 @@
-language: node_js
-node_js:
-  - 'node'
-  - '6'
-  - '4.5'
-  - '4'
-install: make -j4 build
-script: make full-test
