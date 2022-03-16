@@ -106,6 +106,15 @@
     "browserslist": [
         "maintained node versions"
     ],
+    "mocha": {
+        "require": [
+            "./lib/test/index.js"
+        ],
+        "spec": [
+            "./lib/**/*.test.js",
+            "./lib/test/**/*.js"
+        ]
+    },
     "nyc": {
         "extends": "@istanbuljs/nyc-config-babel",
         "include": [

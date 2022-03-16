@@ -1,4 +1,0 @@
-{
-    "require": ["./lib/test/index.js"],
-    "spec": ["./lib/**/*.test.js", "./lib/test/**/*.js"]
-}
