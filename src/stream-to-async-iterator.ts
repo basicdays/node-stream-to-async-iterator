@@ -83,7 +83,6 @@ export default class StreamToAsyncIterator<T = unknown>
                 try {
                     untilReadable = this._untilReadable();
                     untilEnd = this._untilEnd();
-                    // need to wait until the stream is readable or ended
                     await Promise.race([
                         untilReadable.promise,
                         untilEnd.promise,

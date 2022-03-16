@@ -38,14 +38,9 @@
         "watch:babel": "npm run build:babel -- --watch",
         "watch:tsc": "npm run build:tsc -- --watch --preserveWatchOutput"
     },
-    "dependencies": {
-        "@babel/runtime": "^7.17.7",
-        "core-js-pure": "^3.21.1"
-    },
     "devDependencies": {
         "@babel/cli": "^7.17.6",
         "@babel/core": "^7.17.7",
-        "@babel/plugin-transform-runtime": "^7.17.0",
         "@babel/preset-env": "^7.16.11",
         "@babel/preset-typescript": "^7.16.7",
         "@babel/register": "^7.17.7",
@@ -57,7 +52,6 @@
         "@typescript-eslint/eslint-plugin": "^5.15.0",
         "@typescript-eslint/parser": "^5.15.0",
         "babel-plugin-istanbul": "^6.1.1",
-        "babel-plugin-polyfill-corejs3": "^0.5.2",
         "chai": "^4.3.6",
         "chai-as-promised": "^7.1.1",
         "eslint": "^8.11.0",
@@ -81,21 +75,6 @@
                 }
             ],
             "@babel/preset-typescript"
-        ],
-        "plugins": [
-            [
-                "@babel/plugin-transform-runtime",
-                {
-                    "version": "7.17"
-                }
-            ],
-            [
-                "babel-plugin-polyfill-corejs3",
-                {
-                    "method": "usage-pure",
-                    "version": "3.21"
-                }
-            ]
         ],
         "env": {
             "cover": {

@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs, { ReadStream } from "fs";
 import path from "path";
 import { Readable } from "stream";
 
@@ -7,13 +7,33 @@ import { expect } from "chai";
 import S2A from "./stream-to-async-iterator";
 
 describe("StreamToAsyncIterator", function () {
+    let defaultFileStreamEndEvents = 0;
+
+    before(() => {
+        // I guess node 12/14 creates fs read streams with an end event
+        const fileStream = fs.createReadStream(filePath, { encoding: "utf8" });
+        defaultFileStreamEndEvents = fileStream.listenerCount("end");
+        fileStream.destroy();
+    });
+
     const filePath = path.join(__dirname, "test/lorem-ipsum.txt");
 
     function assertClosed(stream: Readable, iter: S2A) {
         expect(stream).to.have.property("destroyed", true);
-        expect(stream.listenerCount("readable")).to.equal(0);
-        expect(stream.listenerCount("end")).to.equal(0);
-        expect(stream.listenerCount("error")).to.equal(0);
+        expect(stream.listenerCount("readable")).to.equal(
+            0,
+            "Stream readable events was not 0"
+        );
+        const endEvents =
+            stream instanceof ReadStream ? defaultFileStreamEndEvents : 0;
+        expect(stream.listenerCount("end")).to.equal(
+            endEvents,
+            `Stream end events was not ${endEvents}`
+        );
+        expect(stream.listenerCount("error")).to.equal(
+            0,
+            "Stream error events was not 0"
+        );
         expect(iter).to.have.property("closed", true);
     }
 
