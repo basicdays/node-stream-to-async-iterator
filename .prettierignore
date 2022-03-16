@@ -3,6 +3,22 @@
 /coverage/
 /lib/
 *.tsbuildinfo
+*.tgz
 
 # node
-node_modules/
+/node_modules/
+**/npm-debug.log*
+
+# editors
+/.idea/
+**/*.kate-swp
+**/*.swp
+**/*~
+
+# git
+**/*.orig
+
+# file managers
+**/.directory
+**/.DS_Store
+**/Thumbs.db
