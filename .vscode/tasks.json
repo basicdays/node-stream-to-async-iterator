@@ -14,22 +14,14 @@
         },
         {
             "type": "npm",
-            "script": "watch",
-            "group": "build",
+            "script": "test:mocha",
             "problemMatcher": [],
-            "label": "npm: watch",
-            "detail": "run-p 'watch:*'"
-        },
-        {
-            "type": "npm",
-            "script": "test",
+            "label": "npm: test:mocha",
+            "detail": "mocha",
             "group": {
                 "kind": "test",
                 "isDefault": true
-            },
-            "problemMatcher": [],
-            "label": "npm: test",
-            "detail": "mocha"
+            }
         }
     ]
 }
