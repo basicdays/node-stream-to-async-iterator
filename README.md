@@ -1,4 +1,4 @@
-# Stream To Async Iterator [![npm version](https://badge.fury.io/js/stream-to-async-iterator.svg)](https://www.npmjs.com/package/stream-to-async-iterator) [![Build Status](https://travis-ci.org/basicdays/node-stream-to-async-iterator.svg?branch=master)](https://travis-ci.org/basicdays/node-stream-to-async-iterator)
+# Stream To Async Iterator [![npm version](https://badge.fury.io/js/stream-to-async-iterator.svg)](https://www.npmjs.com/package/stream-to-async-iterator) ![build](https://github.com/basicdays/node-stream-to-async-iterator/actions/workflows/build.yml/badge.svg)
 
 ## Overview
 
